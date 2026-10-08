@@ -38,7 +38,15 @@ import {
   Youtube,
   ExternalLink,
 } from "lucide-react";
-import { serviceItems, faqs, docs } from "./content";
+import { siteDefaults } from "./site-defaults";
+import { copyDefaults } from "./copy-defaults";
+import {
+  SiteImage,
+  BrandName,
+  Blocks as ContentBlocks,
+  CustomPage,
+  SiteText,
+} from "./cms";
 import "./style.css";
 import {
   Context,
@@ -51,49 +59,48 @@ import {
 } from "./app-context";
 import { Admin, Checkout, OrderPage, OrdersList } from "./commerce";
 import "./commerce.css";
-const icons = { Blocks, Gamepad2, Bot, Globe, Palette, MessagesSquare };
+const icons = {
+  Blocks,
+  Gamepad2,
+  Bot,
+  Globe,
+  Palette,
+  MessagesSquare,
+  Box,
+  Code2,
+  Zap,
+  Terminal,
+  Layers,
+  ShieldCheck,
+};
 function Brand() {
+  const { site } = useApp();
   return (
     <span className="brand-text">
-      dfbng<span> software</span>
+      {site.brand.logo && (
+        <SiteImage className="cms-logo" src={site.brand.logo} alt="" />
+      )}
+      {site.brand.name}
       <i>®</i>
     </span>
   );
 }
 function Socials() {
-  const { t, settings } = useApp();
+  const { site, t, settings } = useApp();
+  if (!site.options.socials) return null;
   return (
     <div className="socials">
-      <Link to="/#integrations" title="Modrinth" className="green">
-        <Zap size={18} />
-      </Link>
-      <Link to="/products" title={t("Mağaza", "Store")} className="blue">
-        <Box size={18} />
-      </Link>
-      <Link to="/services/minecraft-plugin" title="SpigotMC" className="orange">
-        <Gamepad2 size={18} />
-      </Link>
-      <Link
-        to={settings.instagram || "/reference"}
-        title="Instagram"
-        className="pink"
-      >
-        <Instagram size={18} />
-      </Link>
-      <Link to="/docs" title="YouTube" className="red">
-        <Youtube size={20} />
-      </Link>
-      <Link
-        to={settings.discord || "/contact"}
-        title="Discord"
-        className="purple"
-      >
-        <Bot size={20} />
-      </Link>
+      {site.socials.map((n, i) => (
+        <Link key={i} to={n.url} title={t(n.title.tr, n.title.en)}>
+          <Globe size={18} />
+          <span className="sr-only">{t(n.title.tr, n.title.en)}</span>
+        </Link>
+      ))}
     </div>
   );
 }
 function Header() {
+  const { site, serviceItems, faqs, docs } = useApp();
   const { t, lang, setLang, user } = useApp();
   const [menu, setMenu] = useState(null),
     [mobile, setMobile] = useState(false);
@@ -112,124 +119,12 @@ function Header() {
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
   }, []);
-  const navs = [
-    ["team", t("Takım", "Team")],
-    ["store", t("Mağaza", "Store")],
-    ["custom", t("Özel Sipariş", "Custom order")],
-    ["services", t("Hizmetler", "Services")],
-    ["docs", t("Dokümantasyon", "Documentation")],
-  ];
-  const items =
-    menu === "team"
-      ? [
-          [
-            Users,
-            t("Takım", "Team"),
-            t("Projelerin arkasındaki ekip", "The people behind the projects"),
-            "/career/team",
-          ],
-          [
-            Briefcase,
-            t("Kariyer", "Careers"),
-            t("Birlikte üretelim", "Build with us"),
-            "/career",
-          ],
-          [
-            Building2,
-            t("Hakkımızda", "About us"),
-            t("Biz kimiz, neler yapıyoruz?", "Who we are and what we do"),
-            "/about",
-          ],
-          [
-            Layers,
-            t("Referanslar", "References"),
-            t("Üzerinde çalıştığımız projeler", "Explore our projects"),
-            "/reference",
-          ],
-          [
-            MessagesSquare,
-            t("İletişim", "Contact"),
-            t(
-              "Tanışalım, projenizi konuşalım",
-              "Let’s talk about your project",
-            ),
-            "/contact",
-          ],
-        ]
-      : menu === "store"
-        ? [
-            ...serviceItems
-              .slice(0, 4)
-              .map((s) => [
-                icons[s[5]],
-                s[lang === "tr" ? 1 : 2],
-                s[lang === "tr" ? 3 : 4],
-                "/products/" + s[0],
-              ]),
-            [
-              Palette,
-              t("Tasarım", "Design"),
-              t("Görsel kimlik ve arayüz", "Visual identity and interfaces"),
-              "/products/design",
-            ],
-            [
-              ShoppingBag,
-              t("Tüm ürünler", "All products"),
-              t("Mağazanın tamamını keşfedin", "Browse the whole store"),
-              "/products",
-            ],
-          ]
-        : menu === "services"
-          ? serviceItems.map((s) => [
-              icons[s[5]],
-              s[lang === "tr" ? 1 : 2],
-              s[lang === "tr" ? 3 : 4],
-              "/services/" + s[0],
-            ])
-          : [
-              [
-                BookOpen,
-                t("Dokümantasyon", "Documentation"),
-                t("Kurulum ve kullanım rehberleri", "Setup and usage guides"),
-                "/docs",
-              ],
-              [
-                Code2,
-                "API " + t("Dokümantasyonu", "Documentation"),
-                t(
-                  "Geliştiriciler için başvuru kaynağı",
-                  "A reference for developers",
-                ),
-                "/api-docs",
-              ],
-              [
-                Terminal,
-                "Blog",
-                t("Duyurular ve yazılar", "Announcements and articles"),
-                "/blog",
-              ],
-              [
-                MessagesSquare,
-                "Forum",
-                t(
-                  "Sorun, deneyimlerinizi paylaşın",
-                  "Ask questions, share your experience",
-                ),
-                "/forum",
-              ],
-              [
-                ShieldCheck,
-                t("Sözleşmeler", "Agreements"),
-                t("Kullanım ve gizlilik koşulları", "Terms and privacy"),
-                "/terms",
-              ],
-              [
-                LifeBuoy,
-                t("Destek Merkezi", "Help Center"),
-                t("Size nasıl yardımcı olabiliriz?", "How can we help?"),
-                "/contact",
-              ],
-            ];
+  const navs = site.navigation
+    .filter((n) => n.visible)
+    .map((n, i) => [String(i), t(n.title.tr, n.title.en), n]);
+  const items = (
+    site.navigation.filter((n) => n.visible)[Number(menu)]?.children || []
+  ).map((n) => [Globe, t(n.title.tr, n.title.en), "", n.url]);
   return (
     <header
       onClick={(e) => {
@@ -240,16 +135,16 @@ function Header() {
       }}
     >
       <div className="nav-wrap">
-        <Link to="/" className="brand" aria-label="dfbng software">
+        <Link to="/" className="brand" aria-label={site.brand.name}>
           <Brand />
         </Link>
         <nav
           className={mobile ? "mobile-open" : ""}
           aria-label={t("Ana menü", "Main navigation")}
         >
-          {navs.map(([id, label]) =>
-            id === "custom" ? (
-              <Link key={id} to="/custom-order">
+          {navs.map(([id, label, entry]) =>
+            !entry.children.length ? (
+              <Link key={id} to={entry.url}>
                 {label}
               </Link>
             ) : (
@@ -265,10 +160,13 @@ function Header() {
           )}
         </nav>
         <div className="nav-account">
-          <Link to="/dfbng-os" className="os-link">
-            <Code2 size={15} />
-            dfbngOS
-          </Link>
+          {site.options.os && (
+            <Link to="/dfbng-os" className="os-link">
+              <Code2 size={15} />
+              {site.brand.name}
+              <SiteText tr={" OS"} />
+            </Link>
+          )}
           <div className="account-pill">
             <button
               className="language"
@@ -279,14 +177,18 @@ function Header() {
               <span>{lang === "tr" ? "🇹🇷" : "🇬🇧"}</span>
               <ChevronDown size={12} />
             </button>
-            <Link
-              to={user ? "/account" : "/login"}
-              aria-label={
-                user ? t("Panelim", "My dashboard") : t("Giriş Yap", "Sign In")
-              }
-            >
-              {user ? <User size={18} /> : t("Giriş Yap", "Sign In")}
-            </Link>
+            {site.options.login && (
+              <Link
+                to={user ? "/account" : "/login"}
+                aria-label={
+                  user
+                    ? t("Panelim", "My dashboard")
+                    : t("Giriş Yap", "Sign In")
+                }
+              >
+                {user ? <User size={18} /> : t("Giriş Yap", "Sign In")}
+              </Link>
+            )}
           </div>
         </div>
         <button
@@ -302,19 +204,21 @@ function Header() {
           {[
             ["tr", "🇹🇷", "Türkçe"],
             ["en", "🇬🇧", "English"],
-          ].map(([l, flag, title]) => (
-            <button
-              key={l}
-              onClick={() => {
-                setLang(l);
-                setMenu(null);
-              }}
-            >
-              {flag} {title}
-              <small>{l.toUpperCase()}</small>
-              {lang === l && <Check size={14} />}
-            </button>
-          ))}
+          ]
+            .filter(([l]) => site.options[l === "tr" ? "turkish" : "english"])
+            .map(([l, flag, title]) => (
+              <button
+                key={l}
+                onClick={() => {
+                  setLang(l);
+                  setMenu(null);
+                }}
+              >
+                {flag} {title}
+                <small>{l.toUpperCase()}</small>
+                {lang === l && <Check size={14} />}
+              </button>
+            ))}
         </div>
       )}
       {menu && menu !== "language" && (
@@ -362,12 +266,16 @@ function Header() {
   );
 }
 function Hero() {
-  const { t, lang } = useApp();
+  const { t, lang, site } = useApp();
   const [word, setWord] = useState(0);
   useEffect(() => {
+    if (!site.options.animations) {
+      setWord(0);
+      return;
+    }
     const timer = setInterval(() => setWord((w) => (w + 1) % 3), 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [site.options.animations]);
   return (
     <section className="hero">
       <Socials />
@@ -406,7 +314,10 @@ function Hero() {
         <CTA to="/products">{t("Mağazamızı İncele", "Browse our store")}</CTA>
       </div>
       <div className="hero-corner">
-        dfbng software<span>CRAFTED FOR YOUR WORLD</span>
+        <BrandName />
+        <span>
+          <SiteText tr={"CRAFTED FOR YOUR WORLD"} />
+        </span>
       </div>
       <span className="hero-scroll">
         {t("KEŞFETMEYE DEVAM ET", "KEEP EXPLORING")}
@@ -427,38 +338,15 @@ function SectionTitle({ eyebrow, title, accent, description }) {
   );
 }
 function Partners() {
-  const { t } = useApp();
+  const { site, t } = useApp();
   return (
-    <section className="partners">
-      <p>
-        {t("PROJENİZİN TEKNOLOJİ ORTAĞI", "YOUR PROJECT’S TECHNOLOGY PARTNER")}
-      </p>
-      <div>
-        <span>
-          <Blocks />
-          Minecraft
-        </span>
-        <span className="fivem">
-          <Gamepad2 />
-          FiveM
-        </span>
-        <span>
-          <Bot />
-          Discord
-        </span>
-        <span>
-          <Layers />
-          Paper
-        </span>
-        <span>
-          <Zap />
-          Folia
-        </span>
-        <span>
-          <Box />
-          Purpur
-        </span>
-      </div>
+    <section className="partners container">
+      {site.partners.map((p, i) => (
+        <Link to={p.url} key={i}>
+          <Blocks size={22} />
+          <span>{t(p.title.tr, p.title.en)}</span>
+        </Link>
+      ))}
     </section>
   );
 }
@@ -497,8 +385,13 @@ function ServicesPreview() {
           <div className="chart">
             <small>{t("TOPLAM SATIŞ", "TOTAL SALES")}</small>
             <strong>
-              ₺34.850<span>,50</span>
-              <i>↗ 24.8%</i>
+              <SiteText tr={"₺34.850"} />
+              <span>
+                <SiteText tr={",50"} />
+              </span>
+              <i>
+                <SiteText tr={"↗ 24.8%"} />
+              </i>
             </strong>
             <svg
               viewBox="0 0 400 130"
@@ -549,7 +442,7 @@ function ServicesPreview() {
           <div className="sector-images">
             {["discord", "gta", "minecraft"].map((s, i) => (
               <div key={s}>
-                <img
+                <SiteImage
                   src={"/assets/" + s + ".jpg"}
                   alt={["Discord", "FiveM", "Minecraft"][i]}
                   loading="lazy"
@@ -580,13 +473,39 @@ function ServicesPreview() {
               <i />
               <i />
               <i />
-              <span>dfbng.config.ts</span>
+              <span>
+                <SiteText tr={"dfbng.config.ts"} />
+              </span>
             </div>
             <pre>
-              <span>export default</span> {"{"}
-              <br /> name: <em>"your next big idea"</em>,<br /> performance:{" "}
-              <em>"maximum"</em>,<br /> possibilities: <b>Infinity</b>,<br />{" "}
-              poweredBy: <em>"dfbng software"</em>
+              <span>
+                <SiteText tr={"export default"} />
+              </span>{" "}
+              {"{"}
+              <br />
+              <SiteText tr={" name: "} />
+              <em>
+                <SiteText tr={'"your next big idea"'} />
+              </em>
+              <SiteText tr={","} />
+              <br />
+              <SiteText tr={" performance:"} />{" "}
+              <em>
+                <SiteText tr={'"maximum"'} />
+              </em>
+              <SiteText tr={","} />
+              <br />
+              <SiteText tr={" possibilities: "} />
+              <b>
+                <SiteText tr={"Infinity"} />
+              </b>
+              <SiteText tr={","} />
+              <br /> <SiteText tr={"poweredBy: "} />
+              <em>
+                <SiteText tr={'"'} />
+                <BrandName />
+                <SiteText tr={'"'} />
+              </em>
               <br />
               {"}"}
             </pre>
@@ -610,7 +529,7 @@ function ServicesPreview() {
           </p>
           <div className="map-stack">
             {[1, 2, 3].map((i) => (
-              <img
+              <SiteImage
                 key={i}
                 src={"/assets/build" + i + ".png"}
                 alt={t("Minecraft harita tasarımı", "Minecraft map design")}
@@ -634,8 +553,8 @@ function ProductCard({ product: p }) {
   return (
     <Link to={"/product/" + p.id} className="product-card">
       <div className="product-image">
-        <img
-          src={"/assets/" + p.image}
+        <SiteImage
+          src={p.image.startsWith("/") ? p.image : "/assets/" + p.image}
           alt={p.title[lang === "tr" ? 0 : 1]}
           loading="lazy"
         />
@@ -643,9 +562,14 @@ function ProductCard({ product: p }) {
           <div className="stone-art">
             <Box size={42} />
             <strong>
-              dfbng<span>STONE</span>
+              <SiteText tr={"dfbng"} />
+              <span>
+                <SiteText tr={"STONE"} />
+              </span>
             </strong>
-            <small>MINECRAFT PLUGIN</small>
+            <small>
+              <SiteText tr={"MINECRAFT PLUGIN"} />
+            </small>
           </div>
         )}
         <span className="product-category">{p.category}</span>
@@ -658,7 +582,12 @@ function ProductCard({ product: p }) {
         <p>{p.description[lang === "tr" ? 0 : 1]}</p>
         <div className="product-price">
           <span>
-            {p.oldPrice && <del>₺{p.oldPrice.toLocaleString("tr-TR")}</del>}
+            {p.oldPrice && (
+              <del>
+                <SiteText tr={"₺"} />
+                {p.oldPrice.toLocaleString("tr-TR")}
+              </del>
+            )}
             <b>{p.price ? "₺" + p.price : t("Ücretsiz", "Free")}</b>
           </span>
           <small>
@@ -738,6 +667,7 @@ function ProductGrid({ compact = false, initial = "All" }) {
   );
 }
 function Integrations() {
+  const { site, serviceItems, faqs, docs } = useApp();
   const { t } = useApp();
   return (
     <section id="integrations" className="section integrations">
@@ -754,39 +684,27 @@ function Integrations() {
         )}
       />
       <div className="integration-grid">
-        {[
-          [Blocks, "Minecraft"],
-          [Bot, "Discord"],
-          [Zap, "Folia"],
-          [Code2, "Java"],
-          [Globe, "React"],
-          [Gamepad2, "FiveM"],
-          [Box, "Purpur"],
-          [Terminal, "Node.js"],
-          [Layers, "Paper"],
-          [Palette, "Figma"],
-          [ShieldCheck, "Vault"],
-          [Code2, "TypeScript"],
-        ].map(([Icon, name], i) => (
-          <Link
-            to={"/services/" + serviceItems[i % 6][0]}
-            className={"integration item-" + i}
-            key={name}
-          >
-            <Icon size={32} />
-            <span>{name}</span>
-          </Link>
-        ))}
+        {site.integrations.map((p, i) => {
+          const Icon = icons[p.icon] || Globe;
+          return (
+            <Link key={i} to={p.url} className={"integration item-" + i}>
+              <Icon size={32} />
+              <span>{t(p.title.tr, p.title.en)}</span>
+            </Link>
+          );
+        })}
       </div>
       <div className="integration-core">
-        <img src="/favicon.svg" alt="" />
-        <span>dfbng software</span>
+        <SiteImage src="/favicon.svg" alt="" />
+        <span>
+          <BrandName />
+        </span>
       </div>
     </section>
   );
 }
 function Projects({ page = false }) {
-  const { t } = useApp();
+  const { t, site } = useApp();
   return (
     <section
       className={page ? "container section projects-page" : "section projects"}
@@ -802,19 +720,15 @@ function Projects({ page = false }) {
         />
       )}
       <div className="project-strip">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
-          <Link to="/services/design" key={i}>
-            <img
-              src={"/assets/build" + i + ".png"}
+        {site.projects.map((p, i) => (
+          <Link to={p.url} key={i}>
+            <SiteImage
+              src={p.image}
               loading="lazy"
-              alt={
-                ["Survival", "Spawn", "Lobby", "Hub", "Arena", "City"][i - 1]
-              }
+              alt={t(p.title.tr, p.title.en)}
             />
             <div>
-              <span>
-                {["Survival", "Spawn", "Lobby", "Hub", "Arena", "City"][i - 1]}
-              </span>
+              <span>{t(p.title.tr, p.title.en)}</span>
               <ArrowUpRight size={18} />
             </div>
           </Link>
@@ -876,7 +790,9 @@ function OrderBanner() {
               </span>
               <div>
                 <b>{name}</b>
-                <small>dfbng software</small>
+                <small>
+                  <BrandName />
+                </small>
               </div>
               <span className="request-check">
                 <Check size={15} />
@@ -892,6 +808,7 @@ function OrderBanner() {
   );
 }
 function FAQ() {
+  const { site, serviceItems, faqs, docs } = useApp();
   const { t, lang } = useApp();
   const [open, setOpen] = useState(0);
   return (
@@ -914,10 +831,10 @@ function FAQ() {
               aria-expanded={open === i}
               onClick={() => setOpen(open === i ? null : i)}
             >
-              {f[lang === "tr" ? 0 : 1]}
+              {t(f[0], f[1])}
               {open === i ? <Minus size={17} /> : <Plus size={17} />}
             </button>
-            {open === i && <p>{f[lang === "tr" ? 2 : 3]}</p>}
+            {open === i && <p>{t(f[2], f[3])}</p>}
           </div>
         ))}
       </div>
@@ -940,7 +857,7 @@ function Community() {
           <div className="chat-brand">
             <Bot size={30} />
             <span>
-              dfbng software
+              <SiteText tr={"dfbng software"} />
               <small>
                 {t(
                   "Birlikte daha iyisini üretelim.",
@@ -951,10 +868,15 @@ function Community() {
             <i className="status-dot" />
           </div>
           <div className="chat-message">
-            <span>d.</span>
+            <span>
+              <SiteText tr={"d."} />
+            </span>
             <div>
               <b>
-                dfbng software <small>TEAM</small>
+                <BrandName />{" "}
+                <small>
+                  <SiteText tr={"TEAM"} />
+                </small>
               </b>
               <p>
                 {t(
@@ -991,39 +913,11 @@ function Community() {
   );
 }
 function Footer() {
-  const { t, settings } = useApp();
-  const cols = [
-    [
-      t("Hızlı Bağlantılar", "Quick Links"),
-      [
-        ["/products", t("Mağaza", "Store")],
-        ["/services", t("Hizmetler", "Services")],
-        ["/reference", t("Referanslar", "References")],
-        ["/docs", t("Dokümantasyon", "Documentation")],
-        ["/blog", "Blog"],
-        ["/forum", "Forum"],
-      ],
-    ],
-    [
-      t("Şirket", "Company"),
-      [
-        ["/about", t("Hakkımızda", "About us")],
-        ["/career", t("Kariyer", "Careers")],
-        ["/career/team", t("Takım", "Team")],
-        ["/contact", t("İletişim", "Contact")],
-      ],
-    ],
-    [
-      t("Kaynaklar", "Resources"),
-      [
-        ["/api-docs", "API"],
-        ["/admin", t("Yönetim Paneli", "Admin Panel")],
-        ["/#sss", t("Sıkça Sorulan Sorular", "FAQ")],
-        ["/terms", t("Kullanım Koşulları", "Terms of use")],
-        ["/privacy", t("Gizlilik Politikası", "Privacy policy")],
-      ],
-    ],
-  ];
+  const { t, settings, site } = useApp();
+  const cols = site.footer.map((c) => [
+    t(c.title.tr, c.title.en),
+    c.links.map((n) => [n.url, t(n.title.tr, n.title.en)]),
+  ]);
   return (
     <footer className="container">
       {settings.email && (
@@ -1057,7 +951,8 @@ function Footer() {
       </div>
       <div className="footer-bottom">
         <span>
-          © {new Date().getFullYear()} dfbng software.{" "}
+          © {new Date().getFullYear()} <BrandName />
+          <SiteText tr={"."} />{" "}
           {t("Tüm hakları saklıdır.", "All rights reserved.")}
         </span>
         <span>
@@ -1065,19 +960,22 @@ function Footer() {
           {t("Hayal et. Geliştir. Fark yarat.", "Imagine. Build. Stand out.")}
         </span>
         <span>
-          {t("Geliştiren", "Crafted by")} <b>dfbng software</b>
+          {t("Geliştiren", "Crafted by")}{" "}
+          <b>
+            <BrandName />
+          </b>
         </span>
       </div>
     </footer>
   );
 }
 function Home() {
-  const { t, products } = useApp();
-  return (
-    <>
-      <Hero />
-      <Partners />
-      <ServicesPreview />
+  const { t, products, site } = useApp();
+  const sections = {
+    hero: <Hero />,
+    partners: <Partners />,
+    services: <ServicesPreview />,
+    popular: (
       <section className="section container">
         <SectionTitle
           eyebrow={t(
@@ -1097,7 +995,9 @@ function Home() {
           ))}
         </div>
       </section>
-      <Integrations />
+    ),
+    integrations: <Integrations />,
+    products: (
       <section className="section container">
         <SectionTitle
           title={t("Tüm", "All Our")}
@@ -1109,10 +1009,22 @@ function Home() {
         />
         <ProductGrid compact />
       </section>
-      <Projects />
-      <OrderBanner />
-      <FAQ />
-      <Community />
+    ),
+    projects: <Projects />,
+    order: <OrderBanner />,
+    faq: <FAQ />,
+    community: <Community />,
+  };
+  return (
+    <>
+      {site.home
+        .filter((s) => s.visible)
+        .map((s) => (
+          <div className="cms-home-section" key={s.id}>
+            {sections[s.id]}
+            <ContentBlocks blocks={s.blocks} />
+          </div>
+        ))}
     </>
   );
 }
@@ -1123,10 +1035,14 @@ function PageHero({ label, title, description }) {
       <Link to="/" className="breadcrumb">
         <ArrowLeft size={14} />
         {t("Ana Sayfa", "Home")}
-        <span>/</span>
+        <span>
+          <SiteText tr={"/"} />
+        </span>
         {label || title}
       </Link>
-      <span className="eyebrow">DFBNG SOFTWARE</span>
+      <span className="eyebrow">
+        <SiteText tr={"DFBNG SOFTWARE"} />
+      </span>
       <h1>{title}</h1>
       <p>{description}</p>
     </div>
@@ -1182,17 +1098,22 @@ function ProductDetail() {
       <section className="container product-detail">
         <div>
           <div className="detail-image">
-            <img
-              src={"/assets/" + p.image}
+            <SiteImage
+              src={p.image.startsWith("/") ? p.image : "/assets/" + p.image}
               alt={p.title[lang === "tr" ? 0 : 1]}
             />
             {p.id === "dfbng-stone" && (
               <div className="stone-art">
                 <Box size={60} />
                 <strong>
-                  dfbng<span>STONE</span>
+                  <SiteText tr={"dfbng"} />
+                  <span>
+                    <SiteText tr={"STONE"} />
+                  </span>
                 </strong>
-                <small>MINECRAFT PLUGIN</small>
+                <small>
+                  <SiteText tr={"MINECRAFT PLUGIN"} />
+                </small>
               </div>
             )}
           </div>
@@ -1224,7 +1145,12 @@ function ProductDetail() {
           <span className="eyebrow">{p.category}</span>
           <h2>{p.title[lang === "tr" ? 0 : 1]}</h2>
           <div className="detail-price">
-            {p.oldPrice && <del>₺{p.oldPrice.toLocaleString("tr-TR")}</del>}
+            {p.oldPrice && (
+              <del>
+                <SiteText tr={"₺"} />
+                {p.oldPrice.toLocaleString("tr-TR")}
+              </del>
+            )}
             <strong>{p.price ? "₺" + p.price : t("Ücretsiz", "Free")}</strong>
           </div>
           <span className="muted">
@@ -1257,6 +1183,7 @@ function ProductDetail() {
   );
 }
 function Services() {
+  const { site, serviceItems, faqs, docs } = useApp();
   const { t, lang, path } = useApp();
   const service = serviceItems.find((s) => path === "/services/" + s[0]);
   return (
@@ -1288,7 +1215,9 @@ function Services() {
                 size: 100,
                 strokeWidth: 1,
               })}
-              <span>dfbng software</span>
+              <span>
+                <BrandName />
+              </span>
             </div>
             <div>
               <span className="eyebrow">
@@ -1327,7 +1256,7 @@ function Services() {
         ) : (
           <div className="services-grid">
             {serviceItems.map((s) => {
-              const Icon = icons[s[5]];
+              const Icon = icons[s[5]] || Globe;
               return (
                 <Link
                   to={"/services/" + s[0]}
@@ -1458,7 +1387,10 @@ function RequestForm({ contact = false, career = false }) {
               t("Üretmeye başlayalım", "Start building"),
             ].map((x, i) => (
               <div key={x}>
-                <span>0{i + 1}</span>
+                <span>
+                  <SiteText tr={"0"} />
+                  {i + 1}
+                </span>
                 {x}
               </div>
             ))}
@@ -1477,8 +1409,8 @@ function RequestForm({ contact = false, career = false }) {
               {t("Talebiniz kaydedildi.", "Your request has been saved.")}
             </h2>
             <p>
-              {t("Talep numaranız", "Your request number")}:{" "}
-              <b>{result.reference}</b>
+              {t("Talep numaranız", "Your request number")}
+              <SiteText tr={":"} /> <b>{result.reference}</b>
             </p>
             <p>
               {t(
@@ -1525,7 +1457,7 @@ function RequestForm({ contact = false, career = false }) {
                   maxLength={254}
                   defaultValue={user?.email || ""}
                   required
-                  placeholder="you@example.com"
+                  placeholder={t("you@example.com", "you@example.com")}
                 />
               </label>
             </div>
@@ -1559,9 +1491,15 @@ function RequestForm({ contact = false, career = false }) {
                 {t("Tahmini bütçe", "Estimated budget")}
                 <select name="budget">
                   <option>{t("Birlikte belirleyelim", "Let’s discuss")}</option>
-                  <option>₺1.000 – ₺5.000</option>
-                  <option>₺5.000 – ₺15.000</option>
-                  <option>₺15.000+</option>
+                  <option>
+                    <SiteText tr={"₺1.000 – ₺5.000"} />
+                  </option>
+                  <option>
+                    <SiteText tr={"₺5.000 – ₺15.000"} />
+                  </option>
+                  <option>
+                    <SiteText tr={"₺15.000+"} />
+                  </option>
                 </select>
               </label>
             )}
@@ -1823,10 +1761,12 @@ function Account() {
   );
 }
 function Documentation() {
+  const { site, serviceItems, faqs, docs } = useApp();
   const { t, lang } = useApp();
   const [active, setActive] = useState("start"),
     [search, setSearch] = useState("");
-  const current = docs.find((d) => d[0] === active) || docs[0];
+  const current = docs.find((d) => d[0] === active) ||
+    docs[0] || ["", "", "", "", "", "", ""];
   const filtered = docs.filter((d) =>
     d
       .join(" ")
@@ -1871,13 +1811,15 @@ function Documentation() {
         </aside>
         <article>
           <span className="eyebrow">{t("REHBER", "GUIDE")}</span>
-          <h2>{current[lang === "tr" ? 3 : 4]}</h2>
-          {current[lang === "tr" ? 5 : 6].split(". ").map((p, i) => (
-            <div className="guide-step" key={i}>
-              <span>{i + 1}</span>
-              <p>{p.endsWith(".") ? p : p + "."}</p>
-            </div>
-          ))}
+          <h2>{t(current[3], current[4])}</h2>
+          {t(current[5], current[6])
+            .split(". ")
+            .map((p, i) => (
+              <div className="guide-step" key={i}>
+                <span>{i + 1}</span>
+                <p>{p.endsWith(".") ? p : p + "."}</p>
+              </div>
+            ))}
           <div className="doc-callout">
             <LifeBuoy size={22} />
             <div>
@@ -1921,7 +1863,9 @@ function About({ team = false }) {
         <div className="about-art">
           <Code2 size={110} strokeWidth={1} />
           <Brand />
-          <span>IDEA. CODE. CREATE.</span>
+          <span>
+            <SiteText tr={"IDEA. CODE. CREATE."} />
+          </span>
         </div>
         <div>
           <span className="eyebrow">{t("BİZ KİMİZ?", "WHO ARE WE?")}</span>
@@ -1983,7 +1927,12 @@ function OS() {
   return (
     <>
       <PageHero
-        title="dfbngOS"
+        title={
+          <>
+            <BrandName />
+            <SiteText tr={" OS"} />
+          </>
+        }
         description={t(
           "dfbng software dünyasını farklı bir açıdan keşfedin.",
           "Explore the world of dfbng software from a new perspective.",
@@ -1991,7 +1940,10 @@ function OS() {
       />
       <section className="container os-desktop">
         <div className="os-top">
-          <b>dfbngOS</b>
+          <b>
+            <BrandName />
+            <SiteText tr={" OS"} />
+          </b>
           <span>
             {clock.toLocaleTimeString(t("tr-TR", "en-GB"), {
               hour: "2-digit",
@@ -2006,13 +1958,17 @@ function OS() {
               <i />
               <i />
             </span>
-            dfbng software —{" "}
+            <BrandName />
+            <SiteText tr={" —"} />{" "}
             {app === "terminal" ? "Terminal" : t("Hoş geldiniz", "Welcome")}
           </div>
           {app === "terminal" ? (
             <div className="terminal-content">
               <p>
-                <span>dfbng@software</span> ~ % hello
+                <span>
+                  <SiteText tr={"dfbng@software"} />
+                </span>
+                <SiteText tr={" ~ % hello"} />
               </p>
               <p>
                 {t(
@@ -2020,9 +1976,15 @@ function OS() {
                   "Welcome to your next big idea.",
                 )}
               </p>
-              <p>✓ Minecraft · FiveM · Discord · Web</p>
               <p>
-                <span>dfbng@software</span> ~ % <b className="cursor">_</b>
+                <SiteText tr={"✓ Minecraft · FiveM · Discord · Web"} />
+              </p>
+              <p>
+                <span>
+                  <SiteText tr={"dfbng@software"} />
+                </span>
+                <SiteText tr={" ~ % "} />
+                <b className="cursor">_</b>
               </p>
             </div>
           ) : (
@@ -2068,7 +2030,8 @@ function OS() {
   );
 }
 function Editorial() {
-  const { t, path } = useApp();
+  const { site, serviceItems, faqs, docs } = useApp();
+  const { t, path, lang } = useApp();
   const forum = path === "/forum";
   return (
     <>
@@ -2113,18 +2076,16 @@ function Editorial() {
           </div>
         ) : (
           <div className="services-grid">
-            {docs.slice(1, 4).map((d, i) => (
-              <Link key={d[0]} to="/docs" className="blog-card">
-                <img
-                  src={"/assets/" + ["minecraft", "discord", "gta"][i] + ".jpg"}
-                  alt=""
-                />
+            {site.blog.map((d, i) => (
+              <Link key={i} to={d.url} className="blog-card">
+                <SiteImage src={d.image} alt="" />
                 <div>
                   <span className="eyebrow">
-                    {t("REHBER", "GUIDE")} · 5 MIN
+                    {t("REHBER", "GUIDE")}
+                    <SiteText tr={" · 5 MIN"} />
                   </span>
-                  <h2>{d[t("tr", "en") === "tr" ? 3 : 4]}</h2>
-                  <p>{d[t("tr", "en") === "tr" ? 5 : 6]}</p>
+                  <h2>{t(d.title.tr, d.title.en)}</h2>
+                  <p>{t(d.body.tr, d.body.en)}</p>
                   <span>
                     {t("Devamını oku", "Read more")}
                     <ArrowUpRight size={16} />
@@ -2149,7 +2110,7 @@ function Legal() {
             ? t("Gizlilik Politikası", "Privacy Policy")
             : t("Kullanım Koşulları", "Terms of Use")
         }
-        description="dfbng software"
+        description={<BrandName />}
       />
       <article className="container legal">
         <h2>{t("Verileriniz ve kullanım", "Your data and usage")}</h2>
@@ -2199,15 +2160,19 @@ function ApiDocs() {
   return (
     <>
       <PageHero
-        title="API"
+        title={t("API", "API")}
         description={t(
           "dfbng software ürün kataloğu için geliştirici referansı.",
           "Developer reference for the dfbng software product catalog.",
         )}
       />
       <article className="container legal">
-        <span className="api-method">GET</span>
-        <code> /api/products</code>
+        <span className="api-method">
+          <SiteText tr={"GET"} />
+        </span>
+        <code>
+          <SiteText tr={" /api/products"} />
+        </code>
         <h2>{t("Ürünleri listele", "List products")}</h2>
         <p>
           {t(
@@ -2234,7 +2199,9 @@ function NotFound() {
   const { t } = useApp();
   return (
     <div className="not-found">
-      <span>404</span>
+      <span>
+        <SiteText tr={"404"} />
+      </span>
       <h1>
         {t("Bu sayfa henüz yazılmadı.", "This page hasn’t been written yet.")}
       </h1>
@@ -2243,6 +2210,38 @@ function NotFound() {
   );
 }
 function App() {
+  const [site, setSite] = useState(siteDefaults);
+  const refreshSite = async () => {
+    const d = await api("/site");
+    setSite(d.site);
+    return d.site;
+  };
+  useEffect(() => {
+    refreshSite().catch(() => {});
+  }, []);
+  const serviceItems = site.services.map((s) => [
+    s.id,
+    s.title.tr,
+    s.title.en,
+    s.description.tr,
+    s.description.en,
+    s.icon,
+  ]);
+  const faqs = site.faqs.map((s) => [
+    s.question.tr,
+    s.question.en,
+    s.answer.tr,
+    s.answer.en,
+  ]);
+  const docs = site.docs.map((s) => [
+    s.id,
+    s.title.tr,
+    s.title.en,
+    s.heading.tr,
+    s.heading.en,
+    s.body.tr,
+    s.body.en,
+  ]);
   const [products, setProducts] = useState([]),
     [settings, setSettings] = useState({}),
     [catalogLoading, setCatalogLoading] = useState(true);
@@ -2264,7 +2263,72 @@ function App() {
   const [path, setPath] = useState(location.pathname.replace(/\/$/, "") || "/");
   const [user, setUser] = useState(null),
     [cookie, setCookie] = useState(() => !safeGet("dfbng-cookie"));
-  const t = (tr, en) => (lang === "tr" ? tr : en);
+  const copyIndex = React.useMemo(
+    () => new Map(copyDefaults.map((c) => [c.tr + "\u0000" + c.en, c.key])),
+    [],
+  );
+  const t = (tr, en) => {
+    const original = lang === "tr" ? tr : en;
+    if (path.startsWith("/admin")) return original;
+    const key = copyIndex.get(tr + "\u0000" + en);
+    const value = key && site.copy[key] ? site.copy[key][lang] : original;
+    return typeof value === "string"
+      ? value.replaceAll("dfbng software", site.brand.name)
+      : value;
+  };
+  useEffect(() => {
+    if (!safeGet("dfbng-language")) setLanguage(site.options.defaultLanguage);
+    else if (!site.options[lang === "tr" ? "turkish" : "english"])
+      setLanguage(site.options.defaultLanguage);
+  }, [site.options]);
+  useEffect(() => {
+    const root = document.documentElement;
+    const a = site.appearance;
+    if (path.startsWith("/admin")) {
+      delete root.dataset.siteTheme;
+      delete root.dataset.noAnimation;
+      for (const key of [
+        "background",
+        "text",
+        "surface",
+        "font",
+        "heading",
+        "font-size",
+        "width",
+        "radius",
+        "spacing",
+      ])
+        root.style.removeProperty("--cms-" + key);
+      for (const key of ["muted", "border", "purple", "yellow"])
+        root.style.removeProperty("--" + key);
+      return;
+    }
+    root.dataset.siteTheme = "true";
+    if (!site.options.animations) root.dataset.noAnimation = "true";
+    else delete root.dataset.noAnimation;
+    const values = {
+      background: a.background,
+      text: a.text,
+      surface: a.surface,
+      font: a.font,
+      heading: a.headingFont,
+      "font-size": a.fontSize + "px",
+      width: a.contentWidth + "px",
+      radius: a.radius + "px",
+      spacing: a.spacing + "px",
+    };
+    for (const [k, v] of Object.entries(values))
+      root.style.setProperty("--cms-" + k, v);
+    for (const [k, v] of Object.entries({
+      muted: a.muted,
+      border: a.border,
+      purple: a.accent,
+      yellow: a.secondary,
+    }))
+      root.style.setProperty("--" + k, v);
+    let icon = document.querySelector('link[rel="icon"]');
+    if (icon) icon.href = site.brand.favicon || "/favicon.svg";
+  }, [site, path]);
   const setLang = (l) => {
     setLanguage(l);
     safeSet("dfbng-language", l);
@@ -2295,10 +2359,17 @@ function App() {
   }, []);
   useEffect(() => {
     document.documentElement.lang = lang;
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta)
+      meta.content = t(
+        "dfbng software — Minecraft, FiveM, Discord ve web projeleriniz için profesyonel yazılım çözümleri.",
+        "dfbng software — Professional software solutions for Minecraft, FiveM, Discord and web projects.",
+      );
     document.title =
-      "dfbng software — " +
+      site.brand.name +
+      " — " +
       t("Profesyonel Yazılım Çözümleri", "Premium Software Solutions");
-  }, [lang]);
+  }, [lang, site]);
   let page = path.startsWith("/admin") ? (
     <Admin />
   ) : path.startsWith("/checkout/") ? (
@@ -2352,9 +2423,17 @@ function App() {
   ) : (
     <NotFound />
   );
+  const customPage = site.pages.find((p) => p.path === path);
+  if (customPage)
+    page = customPage.visible ? <CustomPage page={customPage} /> : <NotFound />;
   return (
     <Context.Provider
       value={{
+        site,
+        refreshSite,
+        serviceItems,
+        faqs,
+        docs,
         lang,
         setLang,
         t,
@@ -2371,10 +2450,10 @@ function App() {
       <a className="skip-link" href="#main">
         {t("İçeriğe geç", "Skip to content")}
       </a>
-      {!path.startsWith("/admin") && <Header />}
+      {!path.startsWith("/admin") && site.options.header && <Header />}
       <main id="main">{page}</main>
-      {!path.startsWith("/admin") && <Footer />}
-      {cookie && !path.startsWith("/admin") && (
+      {!path.startsWith("/admin") && site.options.footer && <Footer />}
+      {cookie && site.options.cookieNotice && !path.startsWith("/admin") && (
         <aside
           className="cookie-notice"
           aria-label={t("Çerez bildirimi", "Cookie notice")}

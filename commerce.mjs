@@ -177,7 +177,14 @@ export function commerceRoutes({
     if (!["Minecraft", "FiveM", "Discord", "Web", "Design"].includes(category))
       fail("invalid_input");
     const image = str(input.image, 100);
-    if (!/^[a-zA-Z0-9_-]+\.(png|jpg|svg)$/.test(image)) fail("invalid_input");
+    if (
+      !/^[a-zA-Z0-9_-]+\.(png|jpg|svg)$/.test(image) &&
+      !(
+        /^\/api\/media\/[a-f0-9-]{36}$/.test(image) &&
+        db.prepare("SELECT 1 FROM site_media WHERE id=?").get(image.slice(11))
+      )
+    )
+      fail("invalid_input");
     if (
       !Array.isArray(input.tags) ||
       input.tags.length > 12 ||

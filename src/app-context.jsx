@@ -25,7 +25,21 @@ export async function api(path, body) {
   return data;
 }
 export function Link({ to, children, className = "", ...props }) {
-  const { navigate } = useApp();
+  const { navigate, site, path } = useApp();
+  if (
+    site &&
+    !path.startsWith("/admin") &&
+    !/^\/(?:api|admin|account|login|register|checkout|orders)(?:\/|$)/.test(to)
+  ) {
+    const mapped = site.links.find((x) => x.source === to);
+    if (mapped && mapped.url === "")
+      return (
+        <span className={className} {...props}>
+          {children}
+        </span>
+      );
+    to = mapped?.url ?? to;
+  }
   return (
     <a
       href={to}

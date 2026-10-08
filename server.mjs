@@ -17,6 +17,7 @@ import {
   commerceRoutes,
   uploadProductFile,
 } from "./commerce.mjs";
+import { setupCms, cmsRoutes } from "./cms.mjs";
 const root = dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT || 5173);
 const production = process.argv.includes("--production");
@@ -33,6 +34,7 @@ const { fileDir } = await setupCommerce({
   dataDir,
   seedProducts: products,
 });
+const { mediaDir } = setupCms({ db, dataDir, root });
 const hashToken = (token) => createHash("sha256").update(token).digest("hex");
 const derive = promisify(scrypt);
 const limit = new Map();
@@ -65,11 +67,11 @@ function send(res, status, data, headers = {}) {
 function fail(code, status = 400) {
   throw Object.assign(new Error(code), { status });
 }
-async function body(req) {
+async function body(req, maximum = 16000) {
   let data = "";
   for await (const chunk of req) {
     data += chunk;
-    if (Buffer.byteLength(data) > 16000) fail("invalid_input", 413);
+    if (Buffer.byteLength(data) > maximum) fail("invalid_input", 413);
   }
   try {
     const value = JSON.parse(data);
@@ -153,6 +155,7 @@ const commerce = commerceRoutes({
   makeSession,
   verifyOrigin,
 });
+const cms = cmsRoutes({ db, mediaDir, session, send, fail, verifyOrigin });
 const vite = production
   ? null
   : await (
@@ -230,6 +233,7 @@ const server = http.createServer(async (req, res) => {
   }
   try {
     const path = url.pathname.slice(4);
+    if (req.method === "GET" && (await cms(req, res, path))) return;
     if (req.method === "GET" && (await commerce(req, res, path))) return;
     if (req.method === "GET") {
       if (path === "/health") return send(res, 200, { ok: true });
@@ -247,6 +251,10 @@ const server = http.createServer(async (req, res) => {
       }
     }
     if (req.method === "POST") {
+      if (path === "/admin/media") {
+        await cms(req, res, path);
+        return;
+      }
       if (path === "/admin/files") {
         await uploadProductFile({
           req,
@@ -262,7 +270,11 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       verifyOrigin(req);
-      const input = await body(req);
+      const input = await body(
+        req,
+        path.startsWith("/admin/site") ? 1024 * 1024 : 16000,
+      );
+      if (await cms(req, res, path, input)) return;
       if (await commerce(req, res, path, input)) return;
       if (path === "/register" || path === "/login") {
         throttle(req, "auth", 20);

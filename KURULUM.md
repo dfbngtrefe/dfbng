@@ -13,14 +13,14 @@ npm run dev
 
 Site: **http://localhost:5173** — Yönetim: **http://localhost:5173/admin**
 
-Teslim edilen ZIP'te Efe hesabının şifre özeti `.private/admin-seed.json` içinde bulunur (şifre KkbhknJLOp0x-2jjzyMg27U1dxG_ykt4 kullanıcı ad: admin /admin e yaz!). Belirttiğiniz şifreyle giriş yapabilirsiniz. Şifre açık metin olarak frontend veya kaynak koda yazılmaz. İlk çalıştırmada hesap oluşturulur. Yeniden başlatma mevcut yönetici şifresini değiştirmez. Güvenlik bölümünden şifrenizi değiştirebilirsiniz.
+Teslim edilen ZIP'te Efe hesabının şifre özeti `.private/admin-seed.json` içinde bulunur. Belirttiğiniz şifreyle giriş yapabilirsiniz. Şifre açık metin olarak frontend veya kaynak koda yazılmaz. İlk çalıştırmada hesap oluşturulur. Yeniden başlatma mevcut yönetici şifresini değiştirmez. Güvenlik bölümünden şifrenizi değiştirebilirsiniz.
 
 ## İlk yapılacaklar
 
-1. **Site Ayarları:** Havale bilgileri hazırdır. IBAN: `TR95 0001 500***`, alıcı: **EFE KEN**. Ücretli siparişler açıktır; banka adı isteğe bağlıdır. İleride bu bilgileri panelden değiştirebilirsiniz.
+1. **Site Ayarları:** Havale bilgileri hazırdır. IBAN: `TR95 0001 5001 5800 7314 5318 43`, alıcı: **EFE KENAN ULUS**. Ücretli siparişler açıktır; banka adı isteğe bağlıdır. İleride bu bilgileri panelden değiştirebilirsiniz.
 2. **Ürünler:** Fiyatları ve Türkçe/İngilizce açıklamaları düzenleyin. Kendi gerçek ürün ZIP dosyalarınızı yükleyin (en fazla 25 MB). Varsayılan katalog görselleri tanıtım içindir; ticari plugin/harita dosyaları pakete dahil değildir.
-3. İletişim e-postanızı, Discord ve Instagram bağlantılarınızı ekleyin. Bu alanlar sitedeki bağlantılara uygulanır.
-4. Gerçek işletmenize ait kullanım, teslimat ve gizlilik metinlerini `src/main.jsx` içinde düzenleyin. Ardından üretim derlemesi alın.
+3. İletişim e-postanızı ekleyin. Sosyal bağlantılar için **Siteyi Düzenle → Sosyal bağlantılar** ekranını kullanın; buradaki özel bağlantılar başlangıçtaki Discord/Instagram ayarlarına göre önceliklidir.
+4. **Siteyi Düzenle → Tüm metinler / Sayfa oluşturucu:** İşletmenize ait kullanım, teslimat ve gizlilik metinlerini panelden düzenleyin. Kaydetmeniz yeterlidir.
 
 ## Havale / EFT akışı
 
@@ -72,3 +72,13 @@ Testler geçici veritabanlarında çalışır; gerçek banka transferi yapmaz. Y
 Banka entegrasyonu/otomatik banka sorgusu yoktur; havaleler yönetici tarafından kontrol edilir. Otomatik e-posta, şifre sıfırlama, e-posta doğrulama ve herkese açık forum gönderileri bulunmaz. Destek yanıtları site hesabında görüntülenir. Forum kartları destek formuna gider. Üçüncü taraf hizmetlere ve canlı siteye yayınlama bu ZIP'in parçası değildir.
 
 Tasarım referansı: https://lbdevz.com/. Tanıtım görselleri ve fontlar referans sitenin herkese açık varlıklarından alınmıştır. Gerçek yayın öncesinde kendi görselleriniz ve ürünlerinizle değiştirin veya kullanım hakkını doğrulayın.
+
+## Sitedeki içerikleri değiştirme
+
+Yönetim panelinde **Siteyi Düzenle** bölümüne girin. Site adı da değiştirilebilir. İstediğiniz başlığı seçip alanları düzenleyin; **Değişiklikleri kaydet** butonuna basın. Türkçe/İngilizce başlıkları, görselleri, menüleri, ana sayfa sırasını, renkleri, blog/hizmet/SSS/rehber içeriklerini ve özel sayfaları buradan yönetebilirsiniz. Yeni görsel için önce **Görsel yükle**, sonra ilgili görsel alanından seçim yapın.
+
+**Sayfa oluşturucu** ekranında bir sayfa adresi ve iki dilde başlık girin; içerik blokları ekleyin. `/about` gibi bir içerik sayfasının adresini kullanırsanız eski tasarımın yerine yeni sayfanız gösterilir. `/` adresiyle ana sayfayı da yeniden oluşturabilirsiniz. Ödeme, hesap, ürün ve admin ekranlarının işlem yolları korunur.
+
+**Yedek ve geçmiş** son 20 kayda dönüş ve JSON içerik yedeği sunar. Tam yedek için sunucuyu durdurup `.data` ve `.private` klasörlerini güvenli bir yerde saklayın. Güncelleme sırasında bu klasörleri silmeyin. Yeni ZIP, mevcut veritabanınızı kendiliğinden sıfırlamaz.
+
+Bu paket önceden derlenmiş `dist` içerir. `npm ci` ardından `npm start` ile başlatabilirsiniz. Geliştirme/yeniden derleme komutları kaynak görsellerini gerektiğinde otomatik geri yükler.

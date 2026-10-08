@@ -24,8 +24,8 @@
 }
 :root {
   font-family: Inter, Arial, sans-serif;
-  color: #f6f6f7;
-  background: #030303;
+  color: var(--cms-text, #f6f6f7);
+  background: var(--cms-background, #030303);
   font-synthesis: none;
   font-size: 14px;
   --muted: #85858b;
@@ -191,7 +191,7 @@ header {
   justify-content: space-between;
   gap: 20px;
   padding: 7px 10px;
-  background: #030303;
+  background: var(--cms-background, #030303);
   border-radius: 0 0 22px 22px;
 }
 .brand {
@@ -257,7 +257,7 @@ nav > button[aria-expanded="true"] {
 }
 .account-pill {
   background: #fff;
-  color: #101013;
+  color: var(--cms-surface, #101013);
   display: flex;
   align-items: center;
   border-radius: 25px;
@@ -298,7 +298,7 @@ nav > button[aria-expanded="true"] {
   border: 1px solid #27272c;
   border-radius: 20px;
   overflow: hidden;
-  background: #101013;
+  background: var(--cms-surface, #101013);
   box-shadow: 0 25px 80px #000b;
 }
 .mega-grid {
@@ -412,7 +412,7 @@ nav > button[aria-expanded="true"] {
   left: 50%;
   transform: translateX(-50%);
   padding: 14px 38px;
-  background: #030303;
+  background: var(--cms-background, #030303);
   border-radius: 0 0 20px 20px;
 }
 .hero-content {
@@ -450,7 +450,7 @@ nav > button[aria-expanded="true"] {
   background: #3b3240;
 }
 .hero h1 {
-  font-family: Pixel, monospace;
+  font-family: var(--cms-heading,Pixel), monospace;
   font-weight: 400;
   font-size: clamp(47px, 5.4vw, 82px);
   letter-spacing: -1.5px;
@@ -642,7 +642,7 @@ nav > button[aria-expanded="true"] {
   border: 1px solid #2c2335;
   border-bottom: 0;
   border-radius: 16px 16px 0 0;
-  background: linear-gradient(145deg, #19131d, #101013);
+  background: linear-gradient(145deg, #19131d, var(--cms-surface, #101013));
 }
 .chart > small {
   font-size: 8px;

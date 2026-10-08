@@ -1,3 +1,4 @@
+import { CmsAdmin, BrandName, SiteImage } from "./cms";
 import React, { useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -104,7 +105,9 @@ function CommerceHeading({ title, description }) {
         <ArrowLeft size={14} />
         {t("Hesabım", "My account")}
       </Link>
-      <span className="eyebrow">DFBNG SOFTWARE</span>
+      <span className="eyebrow">
+        <BrandName />
+      </span>
       <h1>{title}</h1>
       <p>{description}</p>
     </div>
@@ -146,8 +149,8 @@ export function Checkout() {
         {p ? (
           <>
             <div className="checkout-product">
-              <img
-                src={"/assets/" + p.image}
+              <SiteImage
+                src={p.image.startsWith("/") ? p.image : "/assets/" + p.image}
                 alt={p.title[lang === "tr" ? 0 : 1]}
               />
               <span className="eyebrow">{p.category}</span>
@@ -497,7 +500,7 @@ function AdminLogin() {
   return (
     <div className="admin-login">
       <Link to="/" className="admin-brand">
-        dfbng <span>software</span>
+        <BrandName />
       </Link>
       <div className="auth-card">
         <span className="auth-icon">
@@ -846,7 +849,14 @@ function ProductEditor({ item, onSaved, onClose }) {
       <div className="form-row">
         <label>
           {t("Kapak görseli", "Cover image")}
-          <select name="image" defaultValue={item?.image || "minecraft.jpg"}>
+          <input
+            name="image"
+            list="product-images"
+            defaultValue={item?.image || "minecraft.jpg"}
+            placeholder="minecraft.jpg veya /api/media/..."
+            required
+          />
+          <datalist id="product-images">
             {[
               "minecraft.jpg",
               "gta.jpg",
@@ -862,7 +872,7 @@ function ProductEditor({ item, onSaved, onClose }) {
             ].map((s) => (
               <option key={s}>{s}</option>
             ))}
-          </select>
+          </datalist>
         </label>
         <label>
           {t("Etiketler (virgülle ayırın)", "Tags (comma separated)")}
@@ -1220,6 +1230,7 @@ export function Admin() {
     ["requests", MessagesSquare, t("Talepler", "Requests")],
     ["users", Users, t("Üyeler", "Members")],
     ["settings", Settings, t("Site Ayarları", "Site Settings")],
+    ["content", Settings, t("Siteyi Düzenle", "Edit Website")],
     ["security", ShieldCheck, t("Güvenlik", "Security")],
   ];
   const orders =
@@ -1234,7 +1245,7 @@ export function Admin() {
     <div className="admin-shell">
       <aside className="admin-sidebar">
         <Link to="/" className="admin-brand">
-          dfbng <span>software</span>
+          <BrandName />
         </Link>
         <span className="admin-label">CONTROL CENTER</span>
         <nav>
@@ -1505,7 +1516,14 @@ export function Admin() {
                     <div className="admin-product-grid">
                       {data.products.map((p) => (
                         <div className="admin-product" key={p.id}>
-                          <img src={"/assets/" + p.image} alt="" />
+                          <SiteImage
+                            src={
+                              p.image.startsWith("/")
+                                ? p.image
+                                : "/assets/" + p.image
+                            }
+                            alt=""
+                          />
                           <span className={p.active ? "save-success" : "muted"}>
                             {p.active
                               ? t("Yayında", "Published")
@@ -1577,6 +1595,7 @@ export function Admin() {
               {tab === "settings" && (
                 <AdminSettings settings={data.settings} onChange={refresh} />
               )}{" "}
+              {tab === "content" && <CmsAdmin />}
               {tab === "security" && <PasswordSettings />}
             </>
           )}

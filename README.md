@@ -19,8 +19,8 @@ Teslim edilen ZIP'te Efe hesabının şifre özeti `.private/admin-seed.json` i�
 
 1. **Site Ayarları:** Havale bilgileri hazırdır. IBAN: `TR95 0001 5001 5800 7314 5318 43`, alıcı: **EFE KENAN ULUS**. Ücretli siparişler açıktır; banka adı isteğe bağlıdır. İleride bu bilgileri panelden değiştirebilirsiniz.
 2. **Ürünler:** Fiyatları ve Türkçe/İngilizce açıklamaları düzenleyin. Kendi gerçek ürün ZIP dosyalarınızı yükleyin (en fazla 25 MB). Varsayılan katalog görselleri tanıtım içindir; ticari plugin/harita dosyaları pakete dahil değildir.
-3. İletişim e-postanızı, Discord ve Instagram bağlantılarınızı ekleyin. Bu alanlar sitedeki bağlantılara uygulanır.
-4. Gerçek işletmenize ait kullanım, teslimat ve gizlilik metinlerini `src/main.jsx` içinde düzenleyin. Ardından üretim derlemesi alın.
+3. İletişim e-postanızı ekleyin. Sosyal bağlantılar için **Siteyi Düzenle → Sosyal bağlantılar** ekranını kullanın; buradaki özel bağlantılar başlangıçtaki Discord/Instagram ayarlarına göre önceliklidir.
+4. **Siteyi Düzenle → Tüm metinler / Sayfa oluşturucu:** İşletmenize ait kullanım, teslimat ve gizlilik metinlerini panelden düzenleyin. Kaydetmeniz yeterlidir.
 
 ## Havale / EFT akışı
 
@@ -72,3 +72,17 @@ Testler geçici veritabanlarında çalışır; gerçek banka transferi yapmaz. Y
 Banka entegrasyonu/otomatik banka sorgusu yoktur; havaleler yönetici tarafından kontrol edilir. Otomatik e-posta, şifre sıfırlama, e-posta doğrulama ve herkese açık forum gönderileri bulunmaz. Destek yanıtları site hesabında görüntülenir. Forum kartları destek formuna gider. Üçüncü taraf hizmetlere ve canlı siteye yayınlama bu ZIP'in parçası değildir.
 
 Tasarım referansı: https://lbdevz.com/. Tanıtım görselleri ve fontlar referans sitenin herkese açık varlıklarından alınmıştır. Gerçek yayın öncesinde kendi görselleriniz ve ürünlerinizle değiştirin veya kullanım hakkını doğrulayın.
+
+## İçerik yönetimi
+
+`/admin` → **Siteyi Düzenle**: site adı/logo/favicon, Türkçe ve İngilizce metinler, renkler/yazı tipleri, dil ve görünüm seçenekleri, ana sayfa bölüm sırası/görünürlüğü, üst ve alt menüler, sosyal ve buton bağlantıları, hizmetler, SSS, rehberler, referanslar, ortaklar, entegrasyonlar, blog, görseller ve özel sayfalar.
+
+- **Değişiklikleri kaydet** taslağı doğrular ve SQLite'a kalıcı olarak kaydeder. Aynı kaydı düzenleyen iki yönetici birbirinin değişikliğini sessizce ezemez.
+- **Tüm metinler** ekranında kelime veya bölümle arayın; Türkçe ve İngilizceyi ayrı düzenleyin. Özgün metne dönüş mümkündür. Admin ekranının kontrol metinleri sabit tutulur.
+- **Görsel yükle** PNG/JPEG/WebP kabul eder (6 MB). Yüklenen görseli logo, sayfa bloğu veya görsel değişimi alanından seçin. Ürün kapağında medya adresini kullanabilirsiniz.
+- **Sayfa oluşturucu** güvenli metin/görsel/buton/banner bloklarıyla yeni sayfalar oluşturur. `/about`, `/blog`, `/docs`, `/terms`, `/privacy` gibi içerik sayfaları ve `/` ana sayfası değiştirilebilir. Hesap, ödeme, ürün ve yönetim işlem yolları korunur. Ürün içerikleri ayrı **Ürünler** ekranındadır.
+- **Yedek ve geçmiş** JSON içerik dışa/içe aktarımı ve son 20 kayda dönüş sağlar. JSON yedeği görsel dosyalarını ve ticari kayıtları içermez.
+- Kalıcı veriler `.data/dfbng.sqlite`; görseller `.data/media`; teslim ZIP dosyaları `.data/files` altındadır. Mevcut kurulumu güncellerken `.data` ve `.private` klasörlerini koruyun. Sunucuyu durdurup `.data` klasörünün tamamını yedekleyin.
+- Küçük dağıtım ZIP'i görsel ve fontları `dist/assets` altında bir kez saklar; `predev`/`prebuild` bunları otomatik olarak `public/assets` içine geri koyar.
+
+Geliştirici yeni statik metin eklediğinde `node scripts/extract-copy.mjs` komutuyla metin kataloğunu yeniler. Siteye yönetim panelinden girilen metinler kod/HTML olarak çalıştırılmaz.
